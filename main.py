@@ -1,17 +1,14 @@
 import time
-import os
+import subprocess
 import sounddevice as sd
 from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
 import numpy as np
-import shlex
 
 SAMPLE_RATE = 16000
 CHANNELS = 1
 OUTPUT_FILE = "output.wav"
-WHISPER_MODEL_SIE = "small"
-
-
+WHISPER_MODEL_SIZE = "small"
 SILENCE_THRESHOLD = 0.01
 SILENCE_DURATION = 1.0
 
@@ -21,7 +18,7 @@ def record_audio() -> None:
     audio_data = []
     silence_start = None
 
-    while True:
+    while 1:
         chunk = sd.rec(
             int(0.2 * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=CHANNELS
         )
@@ -42,17 +39,22 @@ def record_audio() -> None:
     print("Recording complete.")
 
 
-whisper_model = WhisperModel(WHISPER_MODEL_SIE)
+whisper_model = WhisperModel(WHISPER_MODEL_SIZE)
 
 
 def main() -> None:
-    while 1:
-        record_audio()
-        segments, _ = whisper_model.transcribe(OUTPUT_FILE, language="en")
-        text = " ".join([segment.text for segment in segments])
-        if text != "":
-            print(f"Transcribed text: {text}")
-            os.system(f"espeak {shlex.quote('You sayed ' + text)}")
+    try:
+        while 1:
+            record_audio()
+            segments, _ = whisper_model.transcribe(
+                OUTPUT_FILE, language="en", beam_size=5
+            )
+            text = " ".join([segment.text for segment in segments]).strip()
+            if text:
+                print(f"Transcribed text: {text}")
+                subprocess.run(["espeak", f"You said {text}"])
+    except KeyboardInterrupt:
+        print("\nExiting...")
 
 
 if __name__ == "__main__":
