@@ -12,7 +12,7 @@ export const FetchStreamingResponse = async (
   );
 
   const model = new ChatOllama({
-    model: "llama3.2",
+    model: "qwen3:1.7b",
   });
 
   const stream = await model.stream(
