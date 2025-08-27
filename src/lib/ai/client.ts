@@ -1,7 +1,5 @@
-import { toUIMessageStream } from "@ai-sdk/langchain";
-import { createUIMessageStreamResponse, type UIMessage } from "ai";
-import { ChatOllama } from "@langchain/ollama";
-import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { ollama } from "ollama-ai-provider-v2";
+import { convertToModelMessages, streamText, type UIMessage } from "ai";
 
 export const FetchStreamingResponse = async (
   _input: RequestInfo | URL,
@@ -10,28 +8,16 @@ export const FetchStreamingResponse = async (
   const { messages }: { messages: UIMessage[] } = JSON.parse(
     init?.body as string,
   );
-
-  const model = new ChatOllama({
-    model: "qwen3:1.7b",
+  const result = streamText({
+    model: ollama("qwen3:1.7b"),
+    providerOptions: { ollama: { think: true } },
+    messages: convertToModelMessages(messages),
+    abortSignal: init?.signal as AbortSignal | undefined,
+    system:
+      "You are a helpful assistant that can answer questions and help with tasks",
   });
 
-  const stream = await model.stream(
-    messages.map((message) =>
-      message.role == "user"
-        ? new HumanMessage(
-            message.parts
-              .map((part) => (part.type === "text" ? part.text : ""))
-              .join(""),
-          )
-        : new AIMessage(
-            message.parts
-              .map((part) => (part.type === "text" ? part.text : ""))
-              .join(""),
-          ),
-    ),
-  );
-
-  return createUIMessageStreamResponse({
-    stream: toUIMessageStream(stream),
+  return result.toUIMessageStreamResponse({
+    sendReasoning: true,
   });
 };

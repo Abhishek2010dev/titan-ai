@@ -10,10 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@ai-sdk/langchain": "^1.0.24",
     "@ai-sdk/react": "^2.0.24",
-    "@langchain/core": "^0.3.72",
-    "@langchain/ollama": "^0.2.3",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-hover-card": "^1.1.15",
@@ -32,6 +29,7 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.542.0",
+    "ollama-ai-provider-v2": "^1.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-syntax-highlighter": "^15.6.6",
