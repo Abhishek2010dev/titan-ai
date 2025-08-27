@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { FetchStreamingResponse } from "@/lib/ai/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   PromptInput,
   PromptInputSubmit,
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, stop } = useChat({
+  const { messages, sendMessage, status, stop, error } = useChat({
     transport: new DefaultChatTransport({
       fetch: FetchStreamingResponse,
     }),
