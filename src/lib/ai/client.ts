@@ -5,19 +5,31 @@ export const FetchStreamingResponse = async (
   _input: RequestInfo | URL,
   init?: RequestInit,
 ) => {
-  const { messages }: { messages: UIMessage[] } = JSON.parse(
-    init?.body as string,
-  );
-  const result = streamText({
-    model: ollama("qwen3:1.7b"),
-    providerOptions: { ollama: { think: true } },
-    messages: convertToModelMessages(messages),
-    abortSignal: init?.signal as AbortSignal | undefined,
-    system:
-      "You are a helpful assistant that can answer questions and help with tasks",
-  });
+  try {
+    const { messages }: { messages: UIMessage[] } = JSON.parse(
+      init?.body as string,
+    );
+    console.table(messages);
+    const result = streamText({
+      model: ollama("llama3.2:1"),
+      messages: convertToModelMessages(messages),
+      abortSignal: init?.signal as AbortSignal | undefined,
+      system:
+        "You are a helpful assistant that can answer questions and help with tasks",
+    });
 
-  return result.toUIMessageStreamResponse({
-    sendReasoning: true,
-  });
+    return result.toUIMessageStreamResponse({});
+  } catch (e: any) {
+    console.error("FetchStreamingResponse error:", e);
+    return new Response(
+      JSON.stringify({
+        error: true,
+        message: e?.message ?? "Unknown error occurred",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
 };

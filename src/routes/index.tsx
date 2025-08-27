@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
 
 function App() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat({
+  const { messages, sendMessage, status, stop } = useChat({
     transport: new DefaultChatTransport({
       fetch: FetchStreamingResponse,
     }),
@@ -98,9 +98,10 @@ function App() {
           />
           <PromptInputToolbar>
             <PromptInputSubmit
-              disabled={!input}
               status={status}
               className="absolute bottom-1 right-1"
+              onStop={stop}
+              disabled={status !== "streaming"}
             />
           </PromptInputToolbar>
         </PromptInput>
